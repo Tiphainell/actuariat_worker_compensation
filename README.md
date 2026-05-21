@@ -1,7 +1,7 @@
 # Kaggle Competition — Actuarial Loss Estimation
 
 Lien de la compétition :  
-:contentReference[oaicite:0]{index=0}
+:https://www.kaggle.com/competitions/actuarial-loss-estimation/overview
 
 ---
 
@@ -9,29 +9,8 @@ Lien de la compétition :
 
 L’objectif de cette compétition est de prédire le coût final des sinistres de type *Workers' Compensation* (`UltimateIncurredClaimCost`) à partir de données synthétiques réalistes issues du domaine de l’assurance.
 
-Le problème présente plusieurs défis importants :
-- une forte variabilité des montants de sinistres ;
-- la présence d’outliers et de distributions asymétriques ;
-- des effets temporels potentiellement liés à l’inflation.
-
-Le projet combine :
-- des variables démographiques et métier ;
-- du feature engineering temporel ;
-- ainsi que des features NLP simples extraites des descriptions textuelles des sinistres.
-
 ---
 
-## Données
-
-Le dataset contient environ **90 000 observations** :
-- **54 000 lignes d’entraînement**
-- **36 000 lignes de test**
-
-La variable cible est :
-
-```text
-UltimateIncurredClaimCost
-```
 
 ## Installation
 
@@ -197,14 +176,16 @@ Validation croisée à 5 folds sur RMSE.
 
 - Le modèle basé uniquement sur les features démographiques atteint une RMSE moyenne de **28 484** sur les folds, contre **30 891** pour la baseline seule. Dans cette configuration, la variable `InitialIncurredClaimsCost` apparaît comme une variable fortement explicative.
 
-L’ajout des features NLP améliore marginalement la performance, avec une réduction de RMSE d’environ **215 points**, mais s’accompagne d’une augmentation de la variance d’environ **70 points**. Dans ce cadre, la feature `InitialIncurredClaimsCost` est moins explicative.
+- L’ajout des features NLP améliore marginalement la performance, avec une réduction de RMSE d’environ **215 points**, mais s’accompagne d’une augmentation de la variance d’environ **70 points**. Dans ce cadre, la feature `InitialIncurredClaimsCost` est moins explicative.
 
-Les features NLP utilisées seules ne permettent pas de capturer la structure du problème (RMSE moyenne de **32 485**).
+- Les features NLP utilisées seules ne permettent pas de capturer la structure du problème (RMSE moyenne de **32 485**).
 
-Enfin, le modèle combinant features démographiques et NLP, sans inclure la variable fortement prédictive `InitialIncurredClaimsCost`, atteint une performance comparable au modèle démographique seul (**RMSE 28 441**). Ce résultat suggère que les features construites permettent de répliquer en partie l’information portée par cette variable, tout en améliorant légèrement la robustesse du modèle par rapport à la baseline.
+- Enfin, le modèle combinant features démographiques et NLP, sans inclure la variable fortement prédictive `InitialIncurredClaimsCost`, atteint une performance comparable au modèle démographique seul (**RMSE 28 441**). Ce résultat suggère que les features construites permettent de répliquer en partie l’information portée par cette variable, tout en améliorant légèrement la robustesse du modèle par rapport à la baseline.
 ![img_2.png](img_2.png)
 
-'Résultats dans le notebook Ablation_study.ipynb'
+```
+Résultats dans le notebook Ablation_study.ipynb
+``` 
 
 ### Conclusion expérimentale
 
@@ -223,7 +204,7 @@ python submission_pipeline.py
 Résultats obtenus sur le leaderboard (RMSE 24 207 sur le test privé, 30 626 test public) : 
 ![img_1.png](img_1.png)
 
-Limites et pistes d’amélioration:
+## Limites et pistes d’amélioration:
 
 Plusieurs pistes d’amélioration restent possibles :
 
@@ -232,8 +213,10 @@ Des approches plus avancées pourraient être explorées :
 * embeddings,
 * transformers,
 * modèles pré-entraînés.
+* 
 Le modèle étant interprétable, une analyse des variables importantes via SHAP values pourrait être réalisée et mise au propre.
-* Les gains en performance des différents modèles pourraient être évalués avec des tests statistiques pour documenter le choix des modèles.
+Les gains en performance des différents modèles pourraient être évalués avec des tests statistiques pour documenter le choix des modèles.
+
 Les performances pourraient être améliorées via :
 * une meilleure gestion des outliers ;
 * une optimisation plus poussée des hyperparamètres ;
