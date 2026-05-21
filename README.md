@@ -38,12 +38,20 @@ UltimateIncurredClaimCost
 Cloner le repo et installer les dépendances :
 
 ```bash
-git git@github.com:Tiphainell/actuariat_worker_compensation.git
+git clone git@github.com:Tiphainell/actuariat_worker_compensation.git
 cd actuariat_worker_compensation
 python3 -m venv .venv
 source .venv/bin/activate
 pip install .
 ```
+## Configuration
+
+Spécifier le chemin vers les données dans le fichier config.py :
+
+```Python
+DATA_PATH = "/chemin/vers/les/donnees"
+```
+
 # Structure du projet
 
 ```
@@ -55,17 +63,18 @@ kaggle_actuariat/
 │   └── Ablation_Study.ipynb
 │
 ├── src/
-│   ├── submission_pipeline.py    # Training + inference pipeline
-    ├──  cv_model.py              # Function for cross-validation for the ablation study
+│   ├── submission_pipeline.py   # Training + inference pipeline for Kaggle submission
+    ├── cv_model.py              # Function with the model and cross-validation experiment for the ablation study
 │   │
 │   └── utils/
-│       ├── data_processing.py    # Feature engineering
+│       ├── data_processing.py    # Feature engineering - Demographic features
 │       └── nlp_processing.py     # NLP preprocessing and NLP features
 │
 ├── resultats/                    # Generated Kaggle submissions
 │
 ├── README.md
 └── pyproject.toml
+└── config.py
 
 ```
 
@@ -75,7 +84,7 @@ kaggle_actuariat/
 
 Ce projet s’inscrit dans une problématique de tarification en assurance non-vie : la prédiction du coût final de sinistres (*Workers’ Compensation*) à partir de données assurantielles réalistes et partiellement synthétiques.
 
-L’enjeu principal est de modéliser une variable fortement bruitée et asymétrique, caractérisée par :
+L’enjeu principal est de modéliser une variable fortement bruitée (données synthétiques) et asymétrique, caractérisée par :
 - une forte dispersion des montants de sinistres,
 - une distribution à queue lourde,
 - des effets temporels potentiels (inflation),
@@ -125,7 +134,7 @@ Deux familles de variables ont été construites.
 
 Ces features visent à capturer des effets structurels et temporels :
 
-- composantes temporelles (année, mois, semaine, heure)
+- composantes temporelles (année, mois, semaine, heure) de la date d'accident
 - délai de déclaration du sinistre
 - indicateurs liés aux salaires
 - ratios métier (ex : salaire / durée de travail)
@@ -137,7 +146,7 @@ Objectif : capturer des effets d’inflation, de temporalité et de non-linéari
 
 #### b) Features NLP
 
-Les variables textuelles issues de `ClaimDescription` sont traitées via une approche heuristique (NLTK).
+Les variables textuelles issues de `ClaimDescription` sont traitées pour refléter la gravité de l'accident (librairie NLTK).
 
 Elles permettent d’extraire :
 - type de blessure
@@ -151,9 +160,9 @@ Approche volontairement interprétable afin de tester la valeur ajoutée du sign
 
 ## 5. Modélisation
 
-Le modèle retenu est **XGBoost (gradient boosting sur arbres de décision)**.
+Le modèle retenu est **XGBoost**, particulièrement adapté ici car le problème peut être vu comme une correction résiduelle de `InitialIncurredClaimsCost`.
 
-Ce choix est motivé par :
+Le modèle a également été choisi pour :
 - sa robustesse sur données tabulaires hétérogènes,
 - sa capacité à capturer des non-linéarités,
 - son aptitude à modéliser des interactions complexes,
@@ -184,16 +193,22 @@ Validation croisée à 5 folds sur RMSE.
 
 ### Observations principales
 
-- Les features démographiques et métier constituent le principal signal prédictif.
-- L’ajout des features NLP n’apporte pas d’amélioration significative du RMSE.
-- Les features NLP seules sont insuffisantes pour capturer la structure du problème.
-- La variable `InitialIncurredClaimsCost` est un prédicteur fortement dominant.
 
+
+- Le modèle basé uniquement sur les features démographiques atteint une RMSE moyenne de **28 484** sur les folds, contre **30 891** pour la baseline seule. Dans cette configuration, la variable `InitialIncurredClaimsCost` apparaît comme une variable fortement explicative.
+
+L’ajout des features NLP améliore marginalement la performance, avec une réduction de RMSE d’environ **215 points**, mais s’accompagne d’une augmentation de la variance d’environ **70 points**. Dans ce cadre, la feature `InitialIncurredClaimsCost` est moins explicative.
+
+Les features NLP utilisées seules ne permettent pas de capturer la structure du problème (RMSE moyenne de **32 485**).
+
+Enfin, le modèle combinant features démographiques et NLP, sans inclure la variable fortement prédictive `InitialIncurredClaimsCost`, atteint une performance comparable au modèle démographique seul (**RMSE 28 441**). Ce résultat suggère que les features construites permettent de répliquer en partie l’information portée par cette variable, tout en améliorant légèrement la robustesse du modèle par rapport à la baseline.
 ![img_2.png](img_2.png)
+
+'Résultats dans le notebook Ablation_study.ipynb'
 
 ### Conclusion expérimentale
 
-Le meilleur compromis performance / complexité est obtenu avec un modèle basé uniquement sur les variables démographiques et métier.
+Le meilleur compromis performance / complexité est obtenu avec un modèle basé uniquement sur les variables démographiques.
 
 ---
 
@@ -205,7 +220,7 @@ La génération de la soumission est automatisée via :
 python submission_pipeline.py
 ```
 
-Résultats obtenus sur le leaderboard : 
+Résultats obtenus sur le leaderboard (RMSE 24 207 sur le test privé, 30 626 test public) : 
 ![img_1.png](img_1.png)
 
 Limites et pistes d’amélioration:
@@ -217,7 +232,8 @@ Des approches plus avancées pourraient être explorées :
 * embeddings,
 * transformers,
 * modèles pré-entraînés.
-Le modèle étant interprétable, une analyse des variables importantes via SHAP values pourrait être réalisée.
+Le modèle étant interprétable, une analyse des variables importantes via SHAP values pourrait être réalisée et mise au propre.
+* Les gains en performance des différents modèles pourraient être évalués avec des tests statistiques pour documenter le choix des modèles.
 Les performances pourraient être améliorées via :
 * une meilleure gestion des outliers ;
 * une optimisation plus poussée des hyperparamètres ;

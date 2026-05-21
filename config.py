@@ -1,0 +1,1 @@
+DATA_PATH="/home/tiphainell/Documents/5.Direct Assurance/actuarial-loss-estimation"

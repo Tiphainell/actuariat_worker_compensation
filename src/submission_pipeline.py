@@ -3,6 +3,7 @@ from cv_model import train_final_model
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from config import DATA_PATH
 import argparse
 
 
@@ -56,6 +57,6 @@ def main(data_path: str, nlp: bool):
 
 if __name__ == '__main__':
 
-    data_path = "/home/tiphainell/Documents/5.Direct Assurance/actuarial-loss-estimation"
+    data_path = DATA_PATH
     nlp = False
     main(data_path, nlp)
