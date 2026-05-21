@@ -189,7 +189,7 @@ Résultats dans le notebook Ablation_study.ipynb
 
 ### Conclusion expérimentale
 
-Le meilleur compromis performance / complexité est obtenu avec un modèle basé uniquement sur les variables démographiques.
+Le meilleur compromis performance / complexité est obtenu avec un modèle basé uniquement sur les variables démographiques qui a finalement été choisi pour la soumission.
 
 ---
 
@@ -202,7 +202,10 @@ python submission_pipeline.py
 ```
 
 Résultats obtenus sur le leaderboard (RMSE 24 207 sur le test privé, 30 626 test public) : 
+
 ![img_1.png](img_1.png)
+
+La meilleure performance sur le leaderboard est 23 355 privé, 29 725 sur le test public.
 
 ## Limites et pistes d’amélioration:
 
