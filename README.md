@@ -216,7 +216,7 @@ Des approches plus avancées pourraient être explorées :
 * embeddings,
 * transformers,
 * modèles pré-entraînés.
-* 
+
 Le modèle étant interprétable, une analyse des variables importantes via SHAP values pourrait être réalisée et mise au propre.
 Les gains en performance des différents modèles pourraient être évalués avec des tests statistiques pour documenter le choix des modèles.
 
