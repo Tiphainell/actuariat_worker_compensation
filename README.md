@@ -201,9 +201,9 @@ La génération de la soumission est automatisée via :
 python submission_pipeline.py
 ```
 
-Résultats obtenus sur le leaderboard (RMSE 24 207 sur le test privé, 30 626 test public) : 
+Résultats obtenus sur le leaderboard (RMSE 24 192 sur le test privé, 30 496 test public) : 
 
-![img_1.png](img_1.png)
+![img_3.png](img_3.png)!
 
 La meilleure performance sur le leaderboard est 23 355 privé, 29 725 sur le test public.
 
